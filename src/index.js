@@ -1,6 +1,6 @@
 import './pages/index.css'; // добавьте импорт главного файла стилей 
 import { createCard, deleteCard, likeCard} from './components/card.js';
-import { openModal, removePopupOpened } from './components/modal.js';
+import { closePopup, openPopup, addPopupAnimated } from './components/modal.js';
 import { initialCards } from './components/cards.js';
 
 const cardsContainer = document.querySelector('.places__list');
@@ -13,58 +13,72 @@ const editPopup = document.querySelector('.popup_type_edit');
 const addPopup = document.querySelector('.popup_type_new-card'); 
 const nameInput = document.querySelector('.popup__input_type_name');
 const jobInput = document.querySelector('.popup__input_type_description');
-
+const name = document.querySelector('.popup__input_type_card-name');
+const link = document.querySelector('.popup__input_type_url');
+const profileTitle = document.querySelector('.profile__title');
+const profileDescription = document.querySelector('.profile__description');
+const addForm = document.forms['new-place'];
 
 function showCards(cards){
   cards.forEach(card => {
-      const newCard = createCard(card, deleteCard, likeCard, imageCard);
+      const newCard = createCard(card, deleteCard, likeCard, openImagePopup);
       cardsContainer.append(newCard);
   });
 }
 
 showCards(initialCards);
 
-openModal(editButton, editPopup);
-openModal(addButton, addPopup);
+  editButton.addEventListener('click', function (evt) {
+    addPopupAnimated(editPopup);
+    openPopup(editPopup);
+    if (evt.target.classList.contains('profile__edit-button'))
+    {
+      const form = document.forms['edit-profile'];
+      const name = form.elements.name;
+      name.value = profileTitle.textContent;
+      const description = form.elements.description;
+      description.value = profileDescription.textContent;
+    }
+  });
 
+  addButton.addEventListener('click', function (evt) {
+    addPopupAnimated(addPopup);
+    openPopup(addPopup);
+    addForm.reset(); 
+  });
 
 // Обработчик «отправки» формы, хотя пока
 // она никуда отправляться не будет
-function handleFormSubmit(evt) {
+function submitEditProfile(evt) {
     evt.preventDefault(); 
-    document.querySelector('.profile__title').textContent = nameInput.value;
-    document.querySelector('.profile__description').textContent = jobInput.value;
-    const openedPopup = document.querySelector('.popup_is-opened');
-    removePopupOpened(openedPopup);
+    profileTitle.textContent = nameInput.value;
+    profileDescription.textContent = jobInput.value;
+    const openedPopup = document.querySelector('.popup_type_edit');
+    closePopup(openedPopup);
 }
 
 // Прикрепляем обработчик к форме:
 // он будет следить за событием “submit” - «отправка»
-document.forms['edit-profile'].addEventListener('submit', handleFormSubmit);
+document.forms['edit-profile'].addEventListener('submit', submitEditProfile);
 
 // Обработчик «отправки» формы, хотя пока
 // она никуда отправляться не будет
 function handleAddCard(evt) {
-  const name = document.querySelector('.popup__input_type_card-name');
-  const link = document.querySelector('.popup__input_type_url');
   evt.preventDefault(); 
   const card = {
     name: name.value,
     link: link.value,
   }
-  cardsContainer.prepend(createCard(card, deleteCard, likeCard, imageCard));
-  const openedPopup = document.querySelector('.popup_is-opened');
-  removePopupOpened(openedPopup);
-  name.value ='';
-  link.value = '';
+  cardsContainer.prepend(createCard(card, deleteCard, likeCard, openImagePopup));
+  const openedPopup = document.querySelector('.popup_type_new-card');
+  closePopup(openedPopup);
 }
 
 // Прикрепляем обработчик к форме:
 // он будет следить за событием “submit” - «отправка»
-document.forms['new-place'].addEventListener('submit', handleAddCard);
+addForm.addEventListener('submit', handleAddCard);
 
-
-function imageCard(card){
+function openImagePopup(card){
   popupImagePicture.src = card.querySelector('.card__image').src; 
   popupImageText.textContent = card.querySelector('.card__title').textContent; 
   popupImageText.alt = card.querySelector('.card__image').alt; 

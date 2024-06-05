@@ -2,13 +2,20 @@
 const cardTemplate = document.querySelector('#card-template').content;
 // @todo: DOM узлы
 const cardsContainer = document.querySelector('.places__list');
+
+function getCardTemplate(selector) {
+    const card = cardTemplate.querySelector(selector).cloneNode(true); 
+    return card
+}
+
 // @todo: Функция создания карточки
 export function createCard(cardData, onDelete, onLike, onImage)
 {
-    const card = cardTemplate.querySelector('.places__item').cloneNode(true);
+    const card = getCardTemplate('.places__item');
+    const cardImage = card.querySelector('.card__image');
 
-    card.querySelector('.card__image').src = cardData.link;
-    card.querySelector('.card__image').alt = cardData.name;
+    cardImage.src = cardData.link;
+    cardImage.alt = cardData.name;
     card.querySelector('.card__title').textContent = cardData.name;
 
     const deleteButton = card.querySelector('.card__delete-button');
@@ -17,7 +24,7 @@ export function createCard(cardData, onDelete, onLike, onImage)
     const likeButton = card.querySelector('.card__like-button');
     likeButton.addEventListener('click', () => {onLike(likeButton);});
 
-    const imageButton = card.querySelector('.card__image');
+    const imageButton = cardImage;
     imageButton.addEventListener('click', () => {onImage(card);});
 
     return card;
