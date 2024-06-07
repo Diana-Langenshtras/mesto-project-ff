@@ -11,19 +11,19 @@ export function closePopup(popup) {
 } 
 
 export function closeByOverlayClick(evt) {
-  if (evt.target === evt.currentTarget ||evt.target.classList.contains('popup__close')) {
-    const popupToClose = document.querySelector('.popup_is-opened');
-    closePopup(popupToClose);
-  }
+    if (evt.target === evt.currentTarget ||evt.target.classList.contains('popup__close')) {
+      const popupToClose = document.querySelector('.popup_is-opened');
+      closePopup(popupToClose);
+    }
 }
 
 export function addPopupAnimated(popup) {
-  popup.classList.add('popup_is-animated');
+    
 }
 
 function closeModalByEsc(evt) { 
     if (evt.key === 'Escape') { 
       const openedPopup = document.querySelector('.popup_is-opened');
       closePopup(openedPopup);
-  } 
+    } 
 }
