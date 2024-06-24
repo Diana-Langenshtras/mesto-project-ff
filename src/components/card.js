@@ -1,3 +1,4 @@
+import { deleteCardFromServer, likeCardFromServer, unlikeCardFromServer } from "./api";
 // @todo: Темплейт карточки
 const cardTemplate = document.querySelector('#card-template').content;
 // @todo: DOM узлы
@@ -9,7 +10,7 @@ function getCardTemplate(selector) {
 }
 
 // @todo: Функция создания карточки
-export function createCard(cardData, onDelete, onLike, onImage)
+export function createCard(cardData, onDelete, onLike, onImage, userId)
 {
   const card = getCardTemplate('.places__item');
   const cardImage = card.querySelector('.card__image');
@@ -19,10 +20,17 @@ export function createCard(cardData, onDelete, onLike, onImage)
   card.querySelector('.card__title').textContent = cardData.name;
 
   const deleteButton = card.querySelector('.card__delete-button');
-  deleteButton.addEventListener('click', () => {onDelete(card);})
+  const cardOwnerId = cardData.owner._id;
+  if (cardOwnerId !== userId) { 
+    deleteButton.hidden = true;
+  };
+  deleteButton.addEventListener('click', () => {onDelete(card, cardData);})
 
   const likeButton = card.querySelector('.card__like-button');
-  likeButton.addEventListener('click', () => {onLike(likeButton);});
+  const likesNumber = cardData.likes.length;
+  const likeCount = card.querySelector('.card__like-count'); 
+  likeCount.innerHTML = likesNumber;
+  likeButton.addEventListener('click', () => {onLike(likeButton, likeCount, cardData);});
 
   const imageButton = cardImage;
   imageButton.addEventListener('click', () => {onImage(card);});
@@ -30,12 +38,35 @@ export function createCard(cardData, onDelete, onLike, onImage)
   return card;
 }
 // @todo: Функция удаления карточки
-export function deleteCard(card){
-  card.remove();
+export function deleteCard(card, cardData){
+  deleteCardFromServer(cardData._id).then((data) => {
+    card.remove();
+  })
+  .catch((err) => {
+    console.log(err)
+  })    
 }
 
-export function likeCard(button){
-  button.classList.add('card__like-button_is-active');
+export function likeCard(button, count, cardData){
+  if (button.classList.contains('card__like-button_is-active')) {
+    button.classList.remove('card__like-button_is-active');
+
+    unlikeCardFromServer(cardData._id).then((data) => {             
+      count.textContent = Number(data.likes.length);
+    })
+    .catch((err) => {
+      console.log(err)
+    })      
+    
+  } else {
+    button.classList.add('card__like-button_is-active');
+    likeCardFromServer(cardData._id).then((data) => {
+      count.textContent = Number(data.likes.length);
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+  }
 }
 
 
