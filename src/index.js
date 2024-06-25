@@ -39,12 +39,6 @@ const profileImage = document.querySelector('.profile__image');
 function showCards(cards, userId){
   cards.forEach(card => {
     const newCard = createCard(card, deleteCard, likeCard, openImagePopup, userId);
-    const likeButton = newCard.querySelector('.card__like-button');
-    for (let i = 0; i < card.likes.length; i++) {
-      if (card.likes[i]._id === userId) {
-        likeButton.classList.add('card__like-button_is-active');
-      } 
-    }
     cardsContainer.append(newCard);
   });
 }

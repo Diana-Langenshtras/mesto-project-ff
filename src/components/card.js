@@ -27,6 +27,11 @@ export function createCard(cardData, onDelete, onLike, onImage, userId)
   deleteButton.addEventListener('click', () => {onDelete(card, cardData);})
 
   const likeButton = card.querySelector('.card__like-button');
+  for (let i = 0; i < cardData.likes.length; i++) {
+    if (cardData.likes[i]._id === userId) {
+      likeButton.classList.add('card__like-button_is-active');
+    } 
+  }
   const likesNumber = cardData.likes.length;
   const likeCount = card.querySelector('.card__like-count'); 
   likeCount.innerHTML = likesNumber;
@@ -49,19 +54,21 @@ export function deleteCard(card, cardData){
 
 export function likeCard(button, count, cardData){
   if (button.classList.contains('card__like-button_is-active')) {
-    button.classList.remove('card__like-button_is-active');
-
     unlikeCardFromServer(cardData._id).then((data) => {             
       count.textContent = Number(data.likes.length);
+    })
+    .then(() => {
+      button.classList.remove('card__like-button_is-active');
     })
     .catch((err) => {
       console.log(err)
     })      
-    
   } else {
-    button.classList.add('card__like-button_is-active');
     likeCardFromServer(cardData._id).then((data) => {
       count.textContent = Number(data.likes.length);
+    })
+    .then(() => {
+      button.classList.add('card__like-button_is-active');
     })
     .catch((err) => {
       console.log(err)
